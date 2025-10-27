@@ -1,0 +1,133 @@
+/*
+ *   Arduino UNO con entradas analogicas en A0 y A1, x
+ *   Controlan MIDI en channel 1, Controller 0 y Controller 1  valores entre 0-127
+ *   El botón en pin2 sirve para comenzar y parar la reproducción
+ *   boton en nota 60, colocada en 0 o en 127
+ *   Probado en Linux con Hairless MIDI<->Serial para traducir serial a MIDI
+ * 
+ *   este archivo cargarlo en el arduino como arduino.ino
+ * 
+ */
+
+
+// --- Configuración ---
+
+// Pines para los potenciómetros y el botón
+const int POT1_PIN = A0;
+const int POT2_PIN = A1;
+const int BUTTON_PIN = 2;
+
+// Canal MIDI que usaremos (los canales van del 1 al 16)
+const byte MIDI_CHANNEL = 1;
+
+// Números de Control Change (CC) para cada potenciómetro
+const byte CC_POT1 = 0;
+const byte CC_POT2 = 1;
+
+// Nota MIDI que enviará el botón (60 es Do central o C4)
+const byte BUTTON_NOTE = 60;
+
+// --- CONFIGURACIÓN PARA CONTROLES INCREMENTALES ---
+const int DEADZONE_LOW = 500;
+const int DEADZONE_HIGH = 525;
+const int UPDATE_INTERVAL_MS = 25;
+
+// --- Variables de estado ---
+int currentPot1MidiValue = 64;
+int currentPot2MidiValue = 64;
+unsigned long lastPotUpdateTime = 0;
+
+int lastPot1MidiValueSent = -1;
+int lastPot2MidiValueSent = -1;
+
+// Variables para el botón
+int lastButtonState = HIGH;
+bool buttonToggleState = false; // NUEVO: Guarda si el botón está en estado ON (true) o OFF (false)
+
+// --- Fin de la Configuración ---
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+}
+
+void loop() {
+  
+  // --- LÓGICA PARA LOS POTENCIÓMETROS (AMBOS INCREMENTALES) ---
+  if (millis() - lastPotUpdateTime > UPDATE_INTERVAL_MS) {
+    lastPotUpdateTime = millis();
+
+    // Potenciómetro 1
+    int pot1Reading = analogRead(POT1_PIN);
+    if (pot1Reading < DEADZONE_LOW) {
+      currentPot1MidiValue++;
+    } else if (pot1Reading > DEADZONE_HIGH) {
+      currentPot1MidiValue--;
+    }
+    currentPot1MidiValue = constrain(currentPot1MidiValue, 0, 127);
+    if (currentPot1MidiValue != lastPot1MidiValueSent) {
+      sendControlChange(MIDI_CHANNEL, CC_POT1, currentPot1MidiValue);
+      lastPot1MidiValueSent = currentPot1MidiValue;
+    }
+
+    // Potenciómetro 2
+    int pot2Reading = analogRead(POT2_PIN);
+    if (pot2Reading < DEADZONE_LOW) {
+      currentPot2MidiValue--;
+    } else if (pot2Reading > DEADZONE_HIGH) {
+      currentPot2MidiValue++;
+    }
+    currentPot2MidiValue = constrain(currentPot2MidiValue, 0, 127);
+    if (currentPot2MidiValue != lastPot2MidiValueSent) {
+      sendControlChange(MIDI_CHANNEL, CC_POT2, currentPot2MidiValue);
+      lastPot2MidiValueSent = currentPot2MidiValue;
+    }
+  }
+
+  // --- NUEVA LÓGICA DEL BOTÓN (TIPO TOGGLE/INTERRUPTOR) ---
+  int buttonState = digitalRead(BUTTON_PIN);
+
+  // Detectamos el momento exacto en que se presiona el botón (cuando pasa de HIGH a LOW)
+  // para reaccionar solo una vez por cada pulsación.
+  if (buttonState == LOW && lastButtonState == HIGH) {
+    // Invertimos el estado actual del toggle
+    buttonToggleState = !buttonToggleState;
+
+    if (buttonToggleState) {
+      // Si el nuevo estado es ON, enviamos Note On
+      sendNoteOn(MIDI_CHANNEL, BUTTON_NOTE, 127);
+    } else {
+      // Si el nuevo estado es OFF, enviamos Note Off
+      sendNoteOff(MIDI_CHANNEL, BUTTON_NOTE, 0);
+    }
+    
+    // Un pequeño retardo para el "debounce" (evitar rebotes mecánicos del botón)
+    delay(50);
+  }
+
+  // Actualizamos el estado anterior del botón para la siguiente iteración del loop
+  lastButtonState = buttonState;
+}
+
+// --- Funciones para enviar mensajes MIDI por el puerto serie (sin cambios) ---
+
+void sendControlChange(byte channel, byte controller, byte value) {
+  byte statusByte = 0xB0 | (channel - 1);
+  Serial.write(statusByte);
+  Serial.write(controller);
+  Serial.write(value);
+}
+
+void sendNoteOn(byte channel, byte note, byte velocity) {
+  byte statusByte = 0x90 | (channel - 1);
+  Serial.write(statusByte);
+  Serial.write(note);
+  Serial.write(velocity);
+}
+
+void sendNoteOff(byte channel, byte note, byte velocity) {
+  byte statusByte = 0x80 | (channel - 1);
+  Serial.write(statusByte);
+  Serial.write(note);
+  Serial.write(velocity);
+}
