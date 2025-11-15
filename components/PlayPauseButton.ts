@@ -11,8 +11,8 @@ export class PlayPauseButton extends LitElement {
 
   @property({ type: String }) playbackState: PlaybackState = 'stopped';
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  static styles = css`
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  static override styles = css`
     :host {
       position: relative;
       display: flex;
@@ -178,8 +178,8 @@ export class PlayPauseButton extends LitElement {
     }
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  render() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  protected override render() {
     return html`${this.renderSvg()}<div class="hitbox"></div>`;
   }
 }

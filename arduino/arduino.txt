@@ -1,6 +1,6 @@
 /*
- *   Arduino UNO con entradas analogicas en A0 y A1, x
- *   Controlan MIDI en channel 1, Controller 0 y Controller 1  valores entre 0-127
+ *   Arduino UNO con entradas analogicas en A0-A5,
+ *   Controlan MIDI en channel 1, Controller 0 a 5, valores entre 0-127
  *   El botón en pin2 sirve para comenzar y parar la reproducción
  *   boton en nota 60, colocada en 0 o en 127
  *   Probado en Linux con Hairless MIDI<->Serial para traducir serial a MIDI
@@ -15,6 +15,10 @@
 // Pines para los potenciómetros y el botón
 const int POT1_PIN = A0;
 const int POT2_PIN = A1;
+const int POT3_PIN = A2;
+const int POT4_PIN = A3;
+const int POT5_PIN = A4;
+const int POT6_PIN = A5;
 const int BUTTON_PIN = 2;
 
 // Canal MIDI que usaremos (los canales van del 1 al 16)
@@ -23,6 +27,11 @@ const byte MIDI_CHANNEL = 1;
 // Números de Control Change (CC) para cada potenciómetro
 const byte CC_POT1 = 0;
 const byte CC_POT2 = 1;
+const byte CC_POT3 = 2;
+const byte CC_POT4 = 3;
+const byte CC_POT5 = 4;
+const byte CC_POT6 = 5;
+
 
 // Nota MIDI que enviará el botón (60 es Do central o C4)
 const byte BUTTON_NOTE = 60;
@@ -35,10 +44,19 @@ const int UPDATE_INTERVAL_MS = 25;
 // --- Variables de estado ---
 int currentPot1MidiValue = 64;
 int currentPot2MidiValue = 64;
+int currentPot3MidiValue = 64;
+int currentPot4MidiValue = 64;
+int currentPot5MidiValue = 64;
+int currentPot6MidiValue = 64;
 unsigned long lastPotUpdateTime = 0;
 
 int lastPot1MidiValueSent = -1;
 int lastPot2MidiValueSent = -1;
+int lastPot3MidiValueSent = -1;
+int lastPot4MidiValueSent = -1;
+int lastPot5MidiValueSent = -1;
+int lastPot6MidiValueSent = -1;
+
 
 // Variables para el botón
 int lastButtonState = HIGH;
@@ -53,7 +71,7 @@ void setup() {
 
 void loop() {
   
-  // --- LÓGICA PARA LOS POTENCIÓMETROS (AMBOS INCREMENTALES) ---
+  // --- LÓGICA PARA LOS POTENCIÓMETROS (TODOS INCREMENTALES) ---
   if (millis() - lastPotUpdateTime > UPDATE_INTERVAL_MS) {
     lastPotUpdateTime = millis();
 
@@ -73,14 +91,66 @@ void loop() {
     // Potenciómetro 2
     int pot2Reading = analogRead(POT2_PIN);
     if (pot2Reading < DEADZONE_LOW) {
-      currentPot2MidiValue--;
-    } else if (pot2Reading > DEADZONE_HIGH) {
       currentPot2MidiValue++;
+    } else if (pot2Reading > DEADZONE_HIGH) {
+      currentPot2MidiValue--;
     }
     currentPot2MidiValue = constrain(currentPot2MidiValue, 0, 127);
     if (currentPot2MidiValue != lastPot2MidiValueSent) {
       sendControlChange(MIDI_CHANNEL, CC_POT2, currentPot2MidiValue);
       lastPot2MidiValueSent = currentPot2MidiValue;
+    }
+
+    // Potenciómetro 3
+    int pot3Reading = analogRead(POT3_PIN);
+    if (pot3Reading < DEADZONE_LOW) {
+      currentPot3MidiValue++;
+    } else if (pot3Reading > DEADZONE_HIGH) {
+      currentPot3MidiValue--;
+    }
+    currentPot3MidiValue = constrain(currentPot3MidiValue, 0, 127);
+    if (currentPot3MidiValue != lastPot3MidiValueSent) {
+      sendControlChange(MIDI_CHANNEL, CC_POT3, currentPot3MidiValue);
+      lastPot3MidiValueSent = currentPot3MidiValue;
+    }
+
+    // Potenciómetro 4
+    int pot4Reading = analogRead(POT4_PIN);
+    if (pot4Reading < DEADZONE_LOW) {
+      currentPot4MidiValue++;
+    } else if (pot4Reading > DEADZONE_HIGH) {
+      currentPot4MidiValue--;
+    }
+    currentPot4MidiValue = constrain(currentPot4MidiValue, 0, 127);
+    if (currentPot4MidiValue != lastPot4MidiValueSent) {
+      sendControlChange(MIDI_CHANNEL, CC_POT4, currentPot4MidiValue);
+      lastPot4MidiValueSent = currentPot4MidiValue;
+    }
+
+    // Potenciómetro 5
+    int pot5Reading = analogRead(POT5_PIN);
+    if (pot5Reading < DEADZONE_LOW) {
+      currentPot5MidiValue++;
+    } else if (pot5Reading > DEADZONE_HIGH) {
+      currentPot5MidiValue--;
+    }
+    currentPot5MidiValue = constrain(currentPot5MidiValue, 0, 127);
+    if (currentPot5MidiValue != lastPot5MidiValueSent) {
+      sendControlChange(MIDI_CHANNEL, CC_POT5, currentPot5MidiValue);
+      lastPot5MidiValueSent = currentPot5MidiValue;
+    }
+    
+    // Potenciómetro 6
+    int pot6Reading = analogRead(POT6_PIN);
+    if (pot6Reading < DEADZONE_LOW) {
+      currentPot6MidiValue++;
+    } else if (pot6Reading > DEADZONE_HIGH) {
+      currentPot6MidiValue--;
+    }
+    currentPot6MidiValue = constrain(currentPot6MidiValue, 0, 127);
+    if (currentPot6MidiValue != lastPot6MidiValueSent) {
+      sendControlChange(MIDI_CHANNEL, CC_POT6, currentPot6MidiValue);
+      lastPot6MidiValueSent = currentPot6MidiValue;
     }
   }
 

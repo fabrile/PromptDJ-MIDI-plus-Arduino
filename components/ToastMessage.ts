@@ -8,8 +8,8 @@ import { classMap } from 'lit/directives/class-map.js';
 
 @customElement('toast-message')
 export class ToastMessage extends LitElement {
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  static styles = css`
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  static override styles = css`
     .toast {
       line-height: 1.6;
       position: fixed;
@@ -59,8 +59,8 @@ export class ToastMessage extends LitElement {
     } );
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  render() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  protected override render() {
     return html`<div class=${classMap({ showing: this.showing, toast: true })}>
       <div class="message">${this.renderMessageWithLinks()}</div>
       <button @click=${this.hide}>✕</button>

@@ -16,8 +16,8 @@ import { MidiDispatcher } from '../utils/MidiDispatcher';
 /** The grid of prompt inputs. */
 @customElement('prompt-dj-midi')
 export class PromptDjMidi extends LitElement {
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  static styles = css`
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  static override styles = css`
     :host {
       height: 100%;
       display: flex;
@@ -36,14 +36,15 @@ export class PromptDjMidi extends LitElement {
       background: #111;
     }
     #grid {
-      width: 45vmin;
+      width: 70vmin;
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
       gap: 5vmin;
       margin-top: 8vmin;
     }
     prompt-controller {
-      width: 100%;
+      width: 20vmin;
     }
     play-pause-button {
       position: relative;
@@ -200,8 +201,8 @@ export class PromptDjMidi extends LitElement {
     this.filteredPrompts = new Set([...this.filteredPrompts, prompt]);
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  render() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  protected override render() {
     const bg = styleMap({
       backgroundImage: this.makeBackground(),
     });

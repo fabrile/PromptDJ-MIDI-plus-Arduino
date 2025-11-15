@@ -16,8 +16,8 @@ const HALO_LEVEL_MODIFIER = 1;
 /** A knob for adjusting and visualizing prompt weight. */
 @customElement('weight-knob')
 export class WeightKnob extends LitElement {
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  static styles = css`
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  static override styles = css`
     :host {
       cursor: grab;
       position: relative;
@@ -109,8 +109,8 @@ export class WeightKnob extends LitElement {
     );
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  render() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  protected override render() {
     const rotationRange = Math.PI * 2 * 0.75;
     const minRot = -rotationRange / 2 - Math.PI / 2;
     const maxRot = rotationRange / 2 - Math.PI / 2;

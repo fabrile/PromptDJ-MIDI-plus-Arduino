@@ -15,8 +15,8 @@ import type { Prompt, ControlChange } from '../types';
 /** A single prompt input associated with a MIDI CC. */
 @customElement('prompt-controller')
 export class PromptController extends LitElement {
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  static styles = css`
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  static override styles = css`
     .prompt {
       width: 100%;
       display: flex;
@@ -51,7 +51,7 @@ export class PromptController extends LitElement {
     }
     #text {
       font-weight: 500;
-      font-size: 1.8vmin;
+      font-size: 2.8vmin;
       max-width: 17vmin;
       min-width: 2vmin;
       padding: 0.1em 0.3em;
@@ -81,7 +81,7 @@ export class PromptController extends LitElement {
     }
     @media only screen and (max-width: 600px) {
       #text {
-        font-size: 2.3vmin;
+        font-size: 3.5vmin;
       }
       weight-knob {
         width: 60%;
@@ -111,8 +111,8 @@ export class PromptController extends LitElement {
 
   private lastValidText!: string;
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  connectedCallback() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  override connectedCallback() {
     super.connectedCallback();
     this.midiDispatcher?.addEventListener('cc-message', (e: Event) => {
       const customEvent = e as CustomEvent<ControlChange>;
@@ -129,8 +129,8 @@ export class PromptController extends LitElement {
     });
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  firstUpdated() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  override firstUpdated() {
     // contenteditable is applied to textInput so we can "shrink-wrap" to text width
     // It's set here and not render() because Lit doesn't believe it's a valid attribute.
     this.textInput.setAttribute('contenteditable', 'plaintext-only');
@@ -140,8 +140,8 @@ export class PromptController extends LitElement {
     this.lastValidText = this.text;
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  update(changedProperties: Map<string, unknown>) {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  override update(changedProperties: Map<string, unknown>) {
     if (changedProperties.has('showCC') && !this.showCC) {
       this.learnMode = false;
     }
@@ -214,8 +214,8 @@ export class PromptController extends LitElement {
     this.learnMode = !this.learnMode;
   }
 
-  // FIX: Removed `override` keyword to fix TypeScript inheritance issue.
-  render() {
+  // FIX: Restored override keyword to fix TypeScript inheritance issue.
+  protected override render() {
     const classes = classMap({
       'prompt': true,
       'learn-mode': this.learnMode,

@@ -93,6 +93,10 @@ function buildInitialPrompts() {
 const DEFAULT_PROMPTS = [
   { color: '#9900ff', text: 'Bossa Nova' },
   { color: '#ff25f6', text: 'Drum and Bass' },
+  { color: '#00f2ff', text: 'Psychedelic Trance' },
+  { color: '#ffc800', text: 'Lo-fi Hip Hop' },
+  { color: '#25ff93', text: 'Ambient' },
+  { color: '#ff6600', text: 'Classical Piano' },
 ];
 
 main();
